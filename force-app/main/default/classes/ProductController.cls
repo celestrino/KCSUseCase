@@ -17,12 +17,6 @@ public with sharing class ProductController {
 
         List<OrderItem> orderItemsList = new List<OrderItem>();
 
-        try {
-            
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
-
         return [Select Id, Order.Status, Product2.Name, UnitPrice, Quantity, TotalPrice, PricebookEntryId from OrderItem Where OrderId =: recordId];
     }
 
