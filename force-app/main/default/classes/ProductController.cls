@@ -39,6 +39,10 @@ public with sharing class ProductController {
     @AuraEnabled
     public static String RestApi(String recordId){
 
+        Order order = [Select Id, Account.AccountNumber, OrderNumber, Status from Order where Id=: recordId];
+        
+        //List<OrderItem> items = [Select Id, Product2.Name, Product2.ProductCode, UnitPrice, Quantity from OrderItem where OrderId =: recordId];
+        
         String resp = null;
 
         System.debug(recordId);
@@ -49,18 +53,27 @@ public with sharing class ProductController {
         request.setTimeout(120000);
 
         RequestModel reqModel = new RequestModel();
-        //reqModel.
-
-        String body = '{"accountNumber": "13212312",'+
-             '"orderNumber": "123123",'+
-             '"type": "order type",'+
-             '"status": "order status",'+
-             '"orderProducts": [{'+
-                 '"name": "product name",'+
-                 '"code": "product code",'+
-                 '"unitPrice": 10.00,'+
-                 '"quantity": 1'+
-             '}]}';
+        reqModel.accountNumber = order.Account.AccountNumber;
+        reqModel.orderNumber = order.OrderNumber;
+        reqModel.status = order.Status;
+        
+        List<RequestModel.orderProducts> orderItems = new List<RequestModel.OrderProducts>();
+        
+        for(OrderItem item : [Select Id, Product2.Name, Product2.ProductCode, UnitPrice, Quantity from OrderItem where OrderId =: recordId]){
+            
+            RequestModel.OrderProducts reqItem = new RequestModel.OrderProducts();
+            reqItem.name = item.Product2.Name;
+            reqItem.code = item.Product2.ProductCode;
+            reqItem.unitPrice = item.UnitPrice;
+            reqItem.quantity = item.Quantity;
+            
+            orderItems.add(reqItem);
+            
+        }
+        
+        reqModel.orderProducts = orderItems;
+        
+        String body = JSON.serialize(reqModel, true);
          
         request.setBody(body);
         System.debug(request.getBody());

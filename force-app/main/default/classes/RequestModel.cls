@@ -9,6 +9,6 @@ public with sharing class RequestModel {
 		public String name {get;set;} 
 		public String code {get;set;} 
 		public Double unitPrice {get;set;} 
-        public Integer quantity {get;set;} 
+        public Decimal quantity {get;set;} 
     }
 }
