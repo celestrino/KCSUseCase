@@ -1,0 +1,9 @@
+<template>
+    <lightning-card title="Available Products">
+        <lightning-button label="Confirm Order" onclick={handleConfirm} disabled={disableAct}> </lightning-button>
+        <lightning-datatable data={products} columns={columns} key-field="id" hide-checkbox-column={disableAct} selected-rows={selected}>
+        </lightning-datatable>
+        <lightning-button label="Add Products" onclick={handleClick} class="slds-m-center_x-small" disabled={disableAct}></lightning-button>
+        <c-order-products values={orderItems}></c-order-products>
+    </lightning-card>
+</template>
