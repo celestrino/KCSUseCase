@@ -60,19 +60,15 @@ export default class AvailableProducts extends LightningElement {
             this.error = error;
             this.data = undefined;
 
-            console.log(error);
-
         }
     }
 
     @wire(getOrderItems, { recordId: '$recordId' })
     wiredOrderItems(value) {
-        //this.data = data;
+
         this.wiredList = value;
         let { error, data } = value;
-        console.log('lista wired');
-        console.log(this.wiredList);
-        //console.log(this.data);
+
         if (data) {
             let preparedItems = [];
 
@@ -93,19 +89,13 @@ export default class AvailableProducts extends LightningElement {
                 if (preparedItems[0].OrderStatus == 'Activated') {
                     this.disableAct = true;
 
-                    console.log('É activated');
-                } else {
-                    console.log('não é');
                 }
-
             });
             this.orderItems = preparedItems;
         }
         else if (error) {
             this.error = error;
             this.orderItems = undefined;
-
-            console.log(error);
 
         }
     }
@@ -117,7 +107,7 @@ export default class AvailableProducts extends LightningElement {
 
         for (let pdt in this.selected) {
             const fields = {};
-         
+
             //if (orderItems.some( item => item.PricebookEntryId == selected[pdt].Id)) {
             if (orderItems.findIndex(x => x.PricebookEntryId === this.selected[pdt].Id) >= 0) {
 
@@ -132,19 +122,11 @@ export default class AvailableProducts extends LightningElement {
                 console.log(recordInput);
                 updateRecord(recordInput)
                     .then(() => {
-                        console.log('antes');
-                        console.log(orderItems[index].Quantity);
-                        orderItems[index].Quantity = orderItems[index].Quantity + 1;
-                        //console.log(orderItem[index].Id);
-                        console.log(orderItems[index].Quantity);
-                        console.log('depois');
-                        //return refreshApex(this.orderItems);
-                    });
 
-                console.log('deu bom o update record');
-                //Se não contem eu crio o registro
+                        orderItems[index].Quantity = orderItems[index].Quantity + 1;
+
+                    });
             } else {
-                //const fields = {};
                 fields[ORDERITEM_QUANTITY.fieldApiName] = 1;
                 fields[ORDERITEM_ORDERID.fieldApiName] = this.recordId;
                 fields[ORDERITEM_PRICEBOOKENTRYID.fieldApiName] = this.selected[pdt].Id;
@@ -155,38 +137,21 @@ export default class AvailableProducts extends LightningElement {
                 createRecord(recordInput)
                     .then(orderItem => {
                         this.orderItemId = orderItem.Id;
-                        //return refreshApex(this.orderItems);
                     });
-                console.log('não tem o item');
             }
-
-            console.log(this.selected[pdt]);
-            console.log(this.selected[pdt].Name);
 
         }
         this.setSelectedRows = [];
         this.template.querySelector('c-order-products').updateValues(orderItems);
         //return refreshApex(this.orderItems);
     }
-
     handleConfirm() {
-        console.log('entrou no handleConfirm');
+        restApiMethod({ recordId: this.recordId })
+            .then(result => {
 
-        restApiMethod({ recordId: this.recordId }).then(result => {
-            console.log(result);
-            console.log('success');
+                //block all user interation
+                this.disableAct = true;
 
-            //block all user interation
-            this.disableAct = true;
-
-        })
-            .catch(error => {
-                console.log('error');
-                console.log(error);
-
-            });
-
+            })
     }
-
-
 }

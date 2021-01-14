@@ -3,12 +3,8 @@ public with sharing class ProductController {
     @AuraEnabled(cacheable=true)
     public static List<PriceBookEntry> getProductList(Id recordId){
 
-        System.debug('record Id ' +recordId);
         Order order = [Select Id, Pricebook2Id from Order Where Id =: recordId Limit 1];
-        System.debug('order '+order);
-        System.debug('pricebook '+order.Pricebook2Id);
-        //Pricebook2 pbId = [Select Id, Pricebook2Id From Order Where Id = order.Id Limit 1];
-
+        
         return [Select Product2Id, Product2.Name, UnitPrice From PricebookEntry Where Pricebook2Id =: order.Pricebook2Id and IsActive = true];
     }
 
@@ -16,7 +12,6 @@ public with sharing class ProductController {
     public static List<OrderItem> getOrderItems(Id recordId){
 
         List<OrderItem> orderItemsList = new List<OrderItem>();
-
         return [Select Id, Order.Status, Product2.Name, UnitPrice, Quantity, TotalPrice, PricebookEntryId from OrderItem Where OrderId =: recordId];
     }
 
@@ -27,7 +22,6 @@ public with sharing class ProductController {
         order.Status = 'Activated';
 
         update order;
-        //List<OrderItem> items = [Select Id, Status];
     }
 
     @AuraEnabled
@@ -39,7 +33,6 @@ public with sharing class ProductController {
         
         String resp = null;
 
-        System.debug(recordId);
         HttpRequest request = new HttpRequest();
         request.setEndpoint('https://testinho.requestcatcher.com/');
         request.setMethod('POST');
@@ -70,7 +63,6 @@ public with sharing class ProductController {
         String body = JSON.serialize(reqModel, true);
          
         request.setBody(body);
-        System.debug(request.getBody());
 
         Http http = new Http();
         HttpResponse response;
@@ -78,7 +70,6 @@ public with sharing class ProductController {
         try{
             
             response = http.send(request);
-            System.debug(response);
 
             if(response.getStatusCode() == 200){
                 updateRecords(recordId);
@@ -89,8 +80,7 @@ public with sharing class ProductController {
             }
             
         }catch (Exception e){
-            System.debug(response);
-            System.debug('exception ' +e);
+
             throw e;
         }
         return resp;        
